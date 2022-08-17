@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import D
 
-
 from rest_framework import status
 
 from rest_framework.views import APIView
@@ -20,7 +19,12 @@ class RestaurantAPIView(APIView):
     def get(self,request):
         loc = Point(request.lng, request.lat)
 
-        restaurants=Restaurant.objects.filter(point__distance_lte=(loc, D(m=3000)))
+        # Recherche des restaurants
+        restaurants=[]
+
+        for distance in range(1,3001):
+            restaurant=Restaurant.objects.filter(point__distance_lte=(loc, D(m=distance)))
+            restaurants.append(restaurant)
 
         serializer=views.RestaurantSerializer(restaurants,many=True)
         return Response(serializer.data)
